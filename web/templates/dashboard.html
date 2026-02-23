@@ -1,195 +1,21 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Панель управления — GenZ Quiz</title>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700&display=swap');
-
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: 'Golos Text', sans-serif;
-            background: #0f1117;
-            color: #e4e4e7;
-            min-height: 100vh;
-        }
-
-        /* ─── Header ─── */
-        .header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 20px 32px;
-            border-bottom: 1px solid #1e1f2a;
-        }
-        .header h1 { font-size: 18px; font-weight: 600; }
-        .header a {
-            color: #71717a;
-            text-decoration: none;
-            font-size: 13px;
-            transition: color 0.2s;
-        }
-        .header a:hover { color: #e4e4e7; }
-
-        /* ─── Container ─── */
-        .container {
-            max-width: 960px;
-            margin: 0 auto;
-            padding: 32px 24px;
-        }
-
-        /* ─── Create Session Card ─── */
-        .create-card {
-            background: #1a1b23;
-            border: 1px solid #2a2b35;
-            border-radius: 14px;
-            padding: 28px;
-            margin-bottom: 32px;
-        }
-        .create-card h2 {
-            font-size: 16px;
-            font-weight: 600;
-            margin-bottom: 16px;
-            color: #f4f4f5;
-        }
-        .form-row {
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-        }
-        .form-row input {
-            flex: 1;
-            min-width: 180px;
-            padding: 10px 14px;
-            background: #0f1117;
-            border: 1px solid #2a2b35;
-            border-radius: 8px;
-            color: #e4e4e7;
-            font-size: 14px;
-            font-family: inherit;
-            outline: none;
-            transition: border-color 0.2s;
-        }
-        .form-row input:focus { border-color: #6366f1; }
-        .form-row input::placeholder { color: #52525b; }
-        .btn {
-            padding: 10px 20px;
-            background: #6366f1;
-            color: #fff;
-            border: none;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 500;
-            font-family: inherit;
-            cursor: pointer;
-            transition: background 0.2s;
-            white-space: nowrap;
-        }
-        .btn:hover { background: #4f46e5; }
-        .btn-danger {
-            background: #7f1d2f;
-            font-size: 12px;
-            padding: 6px 12px;
-        }
-        .btn-danger:hover { background: #991b1b; }
-
-        /* ─── Sessions Table ─── */
-        .section-title {
-            font-size: 16px;
-            font-weight: 600;
-            margin-bottom: 16px;
-            color: #f4f4f5;
-        }
-        .sessions-table {
-            width: 100%;
-            border-collapse: separate;
-            border-spacing: 0;
-            background: #1a1b23;
-            border: 1px solid #2a2b35;
-            border-radius: 14px;
-            overflow: hidden;
-        }
-        .sessions-table th {
-            text-align: left;
-            padding: 14px 18px;
-            font-size: 12px;
-            font-weight: 500;
-            color: #71717a;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            border-bottom: 1px solid #2a2b35;
-            background: #15161e;
-        }
-        .sessions-table td {
-            padding: 14px 18px;
-            font-size: 14px;
-            border-bottom: 1px solid #1e1f2a;
-        }
-        .sessions-table tr:last-child td { border-bottom: none; }
-        .sessions-table tr:hover td { background: #1e1f2a; }
-        .sessions-table a {
-            color: #818cf8;
-            text-decoration: none;
-            font-weight: 500;
-        }
-        .sessions-table a:hover { text-decoration: underline; }
-        .tag {
-            display: inline-block;
-            padding: 3px 10px;
-            border-radius: 6px;
-            font-size: 12px;
-            font-weight: 500;
-        }
-        .tag-free { background: #1e293b; color: #94a3b8; }
-        .tag-session { background: #1a2332; color: #60a5fa; }
-
-        .link-row {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .copy-btn {
-            background: none;
-            border: 1px solid #2a2b35;
-            color: #71717a;
-            padding: 4px 10px;
-            border-radius: 6px;
-            font-size: 12px;
-            cursor: pointer;
-            font-family: inherit;
-            transition: all 0.2s;
-        }
-        .copy-btn:hover { border-color: #6366f1; color: #a5b4fc; }
-
-        .mono {
-            font-family: 'JetBrains Mono', 'Fira Code', monospace;
-            font-size: 13px;
-            color: #a1a1aa;
-        }
-
-        .empty {
-            text-align: center;
-            padding: 48px;
-            color: #52525b;
-            font-size: 14px;
-        }
-
-        .actions { display: flex; gap: 8px; align-items: center; }
-    </style>
-</head>
-<body>
+{% extends "base.html" %}
+{% block title %}Панель управления — GenZ Quiz{% endblock %}
+{% block body %}
     <div class="header">
         <h1>📊 GenZ Quiz — Панель управления</h1>
-        <div>
-            <a href="/editor" style="margin-right:16px">Редактор теста</a>
-            <a href="/global" style="margin-right:16px">Общая аналитика</a>
+        <div class="header-nav">
+            <a href="/editor">Редактор теста</a>
+            <a href="/global">Общая аналитика</a>
+            <div class="theme-switcher">
+                <button class="theme-btn" data-theme="light" onclick="setTheme('light')" title="Светлая">☀️</button>
+                <button class="theme-btn" data-theme="dark" onclick="setTheme('dark')" title="Тёмная">🌙</button>
+                <button class="theme-btn" data-theme="system" onclick="setTheme('system')" title="Системная">💻</button>
+            </div>
             <a href="/logout">Выйти</a>
         </div>
     </div>
 
     <div class="container">
-        <!-- Create session -->
         <div class="create-card">
             <h2>Создать новую сессию</h2>
             <form method="POST" action="/session/create">
@@ -201,7 +27,6 @@
             </form>
         </div>
 
-        <!-- Sessions list -->
         <h2 class="section-title">Сессии</h2>
         {% if sessions %}
         <table class="sessions-table">
@@ -232,10 +57,11 @@
                         {% if s.session_id != 'free' %}
                         <div class="link-row">
                             <span class="mono" id="link-{{ s.session_id }}">https://t.me/{{ bot_username }}?start={{ s.session_id }}</span>
-                            <button class="copy-btn" onclick="copyLink('{{ s.session_id }}')">📋</button>
+                            <button class="copy-btn" onclick="copyText(document.getElementById('link-{{ s.session_id }}').textContent.trim(), this)">📋</button>
+                            <button class="copy-btn" onclick="showQR('https://t.me/{{ bot_username }}?start={{ s.session_id }}', '{{ s.session_id }}')" title="QR-код">QR</button>
                         </div>
                         {% else %}
-                        <span style="color:#52525b">—</span>
+                        <span style="color:var(--text-dimmed)">—</span>
                         {% endif %}
                     </td>
                     <td>
@@ -255,15 +81,4 @@
         <div class="empty">Пока нет сессий. Создайте первую!</div>
         {% endif %}
     </div>
-
-    <script>
-    function copyLink(sessionId) {
-        const el = document.getElementById('link-' + sessionId);
-        navigator.clipboard.writeText(el.textContent.trim());
-        const btn = el.nextElementSibling;
-        btn.textContent = '✓';
-        setTimeout(() => btn.textContent = '📋', 1500);
-    }
-    </script>
-</body>
-</html>
+{% endblock %}

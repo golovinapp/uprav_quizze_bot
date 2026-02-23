@@ -1,92 +1,15 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ session_id }} — GenZ Quiz</title>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700&display=swap');
-
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: 'Golos Text', sans-serif;
-            background: #0f1117;
-            color: #e4e4e7;
-            min-height: 100vh;
-        }
-
-        .header {
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 20px 32px; border-bottom: 1px solid #1e1f2a;
-        }
-        .header h1 { font-size: 18px; font-weight: 600; }
-        .header a { color: #71717a; text-decoration: none; font-size: 13px; }
-        .header a:hover { color: #e4e4e7; }
-
-        .container { max-width: 960px; margin: 0 auto; padding: 32px 24px; }
-
-        .meta { margin-bottom: 28px; }
-        .meta h2 { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
-        .meta p { color: #71717a; font-size: 14px; }
-
-        .stats-grid {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 16px; margin-bottom: 32px;
-        }
-        .stat-card {
-            background: #1a1b23; border: 1px solid #2a2b35;
-            border-radius: 14px; padding: 24px; text-align: center;
-        }
-        .stat-card .number { font-size: 36px; font-weight: 700; line-height: 1; margin-bottom: 8px; }
-        .stat-card .label { font-size: 13px; color: #71717a; }
-        .color-a { color: #f87171; } .color-b { color: #fbbf24; } .color-c { color: #34d399; } .color-total { color: #818cf8; }
-
-        .section { margin-bottom: 32px; }
-        .section h3 { font-size: 15px; font-weight: 600; margin-bottom: 16px; color: #f4f4f5; }
-        .bar-group { margin-bottom: 14px; }
-        .bar-label { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 6px; }
-        .bar-label span:first-child { font-weight: 500; }
-        .bar-label span:last-child { color: #a1a1aa; }
-        .bar-track { height: 10px; background: #1e1f2a; border-radius: 5px; overflow: hidden; }
-        .bar-fill { height: 100%; border-radius: 5px; transition: width 0.6s ease; }
-        .bar-fill-a { background: #f87171; } .bar-fill-b { background: #fbbf24; } .bar-fill-c { background: #34d399; }
-
-        .data-table {
-            width: 100%; border-collapse: separate; border-spacing: 0;
-            background: #1a1b23; border: 1px solid #2a2b35; border-radius: 14px; overflow: hidden;
-        }
-        .data-table th {
-            text-align: left; padding: 12px 18px; font-size: 12px; font-weight: 500;
-            color: #71717a; text-transform: uppercase; letter-spacing: 0.05em;
-            border-bottom: 1px solid #2a2b35; background: #15161e;
-        }
-        .data-table td { padding: 12px 18px; font-size: 14px; border-bottom: 1px solid #1e1f2a; }
-        .data-table tr:last-child td { border-bottom: none; }
-
-        .refresh-row { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; }
-        .btn {
-            padding: 8px 18px; background: #6366f1; color: #fff; border: none;
-            border-radius: 8px; font-size: 13px; font-weight: 500; font-family: inherit; cursor: pointer;
-        }
-        .btn:hover { background: #4f46e5; }
-        #auto-label { font-size: 12px; color: #52525b; }
-
-        .deep-link-box {
-            background: #1a1b23; border: 1px solid #2a2b35; border-radius: 10px;
-            padding: 16px 20px; margin-bottom: 28px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
-        }
-        .deep-link-box code { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: #a5b4fc; word-break: break-all; }
-        .deep-link-box .copy-btn {
-            background: none; border: 1px solid #2a2b35; color: #71717a;
-            padding: 4px 10px; border-radius: 6px; font-size: 12px; cursor: pointer; font-family: inherit;
-        }
-    </style>
-</head>
-<body>
+{% extends "base.html" %}
+{% block title %}{{ session_id }} — GenZ Quiz{% endblock %}
+{% block body %}
     <div class="header">
         <h1>📊 GenZ Quiz</h1>
-        <div>
-            <a href="/" style="margin-right:16px">← К сессиям</a>
+        <div class="header-nav">
+            <a href="/">← К сессиям</a>
+            <div class="theme-switcher">
+                <button class="theme-btn" data-theme="light" onclick="setTheme('light')">☀️</button>
+                <button class="theme-btn" data-theme="dark" onclick="setTheme('dark')">🌙</button>
+                <button class="theme-btn" data-theme="system" onclick="setTheme('system')">💻</button>
+            </div>
             <a href="/logout">Выйти</a>
         </div>
     </div>
@@ -99,18 +22,19 @@
 
         {% if session_id != 'free' %}
         <div class="deep-link-box">
-            <span style="font-size:13px;color:#71717a">Ссылка:</span>
+            <span style="font-size:13px;color:var(--text-muted)">Ссылка:</span>
             <code id="deep-link">https://t.me/{{ bot_username }}?start={{ session_id }}</code>
-            <button class="copy-btn" onclick="navigator.clipboard.writeText(document.getElementById('deep-link').textContent);this.textContent='✓';setTimeout(()=>this.textContent='📋',1500)">📋</button>
+            <button class="copy-btn" onclick="copyText(document.getElementById('deep-link').textContent.trim(), this)">📋</button>
+            <button class="copy-btn" onclick="showQR('https://t.me/{{ bot_username }}?start={{ session_id }}', '{{ session_id }}')">QR</button>
         </div>
         {% endif %}
 
         <div class="refresh-row">
-            <button class="btn" onclick="loadStats()">Обновить</button>
+            <button class="btn btn-sm" onclick="loadStats()">Обновить</button>
             <label><input type="checkbox" id="auto-refresh" onchange="toggleAutoRefresh()"> <span id="auto-label">Автообновление (10 сек)</span></label>
         </div>
 
-        <div class="stats-grid" id="stats-cards">
+        <div class="stats-grid">
             <div class="stat-card">
                 <div class="number color-total" id="card-total">{{ stats.total }}</div>
                 <div class="label">Всего прохождений</div>
@@ -157,7 +81,7 @@
                 </tbody>
             </table>
             {% else %}
-            <p style="color:#52525b;font-size:14px">Пока нет данных</p>
+            <p style="color:var(--text-dimmed);font-size:14px">Пока нет данных</p>
             {% endif %}
         </div>
     </div>
@@ -170,48 +94,36 @@
 
     async function loadStats() {
         try {
-            const resp = await fetch(`/api/session/${SESSION_ID}/stats`);
-            const data = await resp.json();
+            const data = await (await fetch(`/api/session/${SESSION_ID}/stats`)).json();
             if (data.style_map) STYLE_MAP = data.style_map;
             updateUI(data);
-        } catch (e) { console.error('Failed to load stats', e); }
+        } catch (e) { console.error(e); }
     }
 
     function updateUI(data) {
         const total = data.total || 0;
         document.getElementById('card-total').textContent = total;
-
         const dist = {};
         for (const d of data.distribution) dist[d.final_result] = d.cnt;
-        for (const letter of ['A', 'B', 'C']) {
-            const el = document.getElementById('card-' + letter);
-            if (el) el.textContent = dist[letter] || 0;
-        }
+        for (const l of ['A','B','C']) { const el = document.getElementById('card-'+l); if(el) el.textContent = dist[l]||0; }
 
-        const barsContainer = document.getElementById('bars-container');
-        let barsHTML = '';
-        for (const letter of ['A', 'B', 'C']) {
-            const cnt = dist[letter] || 0;
-            const pct = total > 0 ? (cnt * 100 / total).toFixed(1) : 0;
-            barsHTML += `<div class="bar-group"><div class="bar-label"><span>${STYLE_MAP[letter] || letter}</span><span>${cnt} (${Math.round(pct)}%)</span></div><div class="bar-track"><div class="bar-fill ${FILL_MAP[letter]}" style="width: ${pct}%"></div></div></div>`;
+        const bc = document.getElementById('bars-container');
+        let h = '';
+        for (const l of ['A','B','C']) {
+            const cnt = dist[l]||0, pct = total>0?(cnt*100/total).toFixed(1):0;
+            h += `<div class="bar-group"><div class="bar-label"><span>${STYLE_MAP[l]||l}</span><span>${cnt} (${Math.round(pct)}%)</span></div><div class="bar-track"><div class="bar-fill ${FILL_MAP[l]}" style="width:${pct}%"></div></div></div>`;
         }
-        barsContainer.innerHTML = barsHTML;
+        bc.innerHTML = h;
 
-        const tbody = document.getElementById('age-tbody');
-        if (tbody && data.by_age) {
-            let rows = '';
-            for (const row of data.by_age) {
-                rows += `<tr><td>${row.age_group || '—'}</td><td>${STYLE_MAP[row.final_result] || row.final_result}</td><td>${row.cnt}</td></tr>`;
-            }
-            tbody.innerHTML = rows;
+        const tb = document.getElementById('age-tbody');
+        if (tb && data.by_age) {
+            tb.innerHTML = data.by_age.map(r => `<tr><td>${r.age_group||'—'}</td><td>${STYLE_MAP[r.final_result]||r.final_result}</td><td>${r.cnt}</td></tr>`).join('');
         }
     }
 
     function toggleAutoRefresh() {
-        if (document.getElementById('auto-refresh').checked) {
-            loadStats(); autoTimer = setInterval(loadStats, 10000);
-        } else { clearInterval(autoTimer); autoTimer = null; }
+        if (document.getElementById('auto-refresh').checked) { loadStats(); autoTimer = setInterval(loadStats, 10000); }
+        else { clearInterval(autoTimer); autoTimer = null; }
     }
     </script>
-</body>
-</html>
+{% endblock %}
