@@ -168,6 +168,8 @@ def create_web_app() -> web.Application:
     app.router.add_get("/editor", editor_page)
     app.router.add_post("/editor/question", save_question_post)
     app.router.add_post("/editor/result", save_result_text_post)
-    app.router.add_static("/static", str(base / "static"))
+    static_dir = base / "static"
+    if static_dir.exists():
+        app.router.add_static("/static", str(static_dir))
 
     return app
