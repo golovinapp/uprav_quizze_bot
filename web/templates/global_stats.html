@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Общая аналитика — GenZ Quiz</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700&display=swap');
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Golos Text', sans-serif;
+            background: #0f1117;
+            color: #e4e4e7;
+            min-height: 100vh;
+        }
+
+        .header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 20px 32px; border-bottom: 1px solid #1e1f2a;
+        }
+        .header h1 { font-size: 18px; font-weight: 600; }
+        .header a { color: #71717a; text-decoration: none; font-size: 13px; }
+        .header a:hover { color: #e4e4e7; }
+
+        .container { max-width: 960px; margin: 0 auto; padding: 32px 24px; }
+
+        .meta { margin-bottom: 28px; }
+        .meta h2 { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+        .meta p { color: #71717a; font-size: 14px; }
+
+        .stats-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px; margin-bottom: 32px;
+        }
+        .stat-card {
+            background: #1a1b23; border: 1px solid #2a2b35;
+            border-radius: 14px; padding: 24px; text-align: center;
+        }
+        .stat-card .number { font-size: 36px; font-weight: 700; line-height: 1; margin-bottom: 8px; }
+        .stat-card .label { font-size: 13px; color: #71717a; }
+        .color-a { color: #f87171; } .color-b { color: #fbbf24; } .color-c { color: #34d399; } .color-total { color: #818cf8; }
+
+        .section { margin-bottom: 32px; }
+        .section h3 { font-size: 15px; font-weight: 600; margin-bottom: 16px; color: #f4f4f5; }
+        .bar-group { margin-bottom: 14px; }
+        .bar-label { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 6px; }
+        .bar-label span:first-child { font-weight: 500; }
+        .bar-label span:last-child { color: #a1a1aa; }
+        .bar-track { height: 10px; background: #1e1f2a; border-radius: 5px; overflow: hidden; }
+        .bar-fill { height: 100%; border-radius: 5px; transition: width 0.6s ease; }
+        .bar-fill-a { background: #f87171; } .bar-fill-b { background: #fbbf24; } .bar-fill-c { background: #34d399; }
+
+        .data-table {
+            width: 100%; border-collapse: separate; border-spacing: 0;
+            background: #1a1b23; border: 1px solid #2a2b35; border-radius: 14px; overflow: hidden;
+        }
+        .data-table th {
+            text-align: left; padding: 12px 18px; font-size: 12px; font-weight: 500;
+            color: #71717a; text-transform: uppercase; letter-spacing: 0.05em;
+            border-bottom: 1px solid #2a2b35; background: #15161e;
+        }
+        .data-table td { padding: 12px 18px; font-size: 14px; border-bottom: 1px solid #1e1f2a; }
+        .data-table tr:last-child td { border-bottom: none; }
+
+        .refresh-row { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; }
+        .btn {
+            padding: 8px 18px; background: #6366f1; color: #fff; border: none;
+            border-radius: 8px; font-size: 13px; font-weight: 500; font-family: inherit; cursor: pointer;
+        }
+        .btn:hover { background: #4f46e5; }
+        #auto-label { font-size: 12px; color: #52525b; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📊 GenZ Quiz</h1>
+        <div>
+            <a href="/" style="margin-right:16px">← К сессиям</a>
+            <a href="/logout">Выйти</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="meta">
+            <h2>Общая аналитика</h2>
+            <p>Агрегированные результаты по всем сессиям</p>
+        </div>
+
+        <div class="refresh-row">
+            <button class="btn" onclick="loadStats()">Обновить</button>
+            <label><input type="checkbox" id="auto-refresh" onchange="toggleAutoRefresh()"> <span id="auto-label">Автообновление (10 сек)</span></label>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="number color-total" id="card-total">{{ stats.total }}</div>
+                <div class="label">Всего прохождений</div>
+            </div>
+            {% for d in stats.distribution %}
+            <div class="stat-card">
+                <div class="number {% if d.final_result == 'A' %}color-a{% elif d.final_result == 'B' %}color-b{% else %}color-c{% endif %}" id="card-{{ d.final_result }}">{{ d.cnt }}</div>
+                <div class="label">{{ stats.style_map.get(d.final_result, d.final_result) }}</div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="section">
+            <h3>Распределение стилей</h3>
+            <div id="bars-container">
+                {% set total = stats.total if stats.total > 0 else 1 %}
+                {% for d in stats.distribution %}
+                <div class="bar-group">
+                    <div class="bar-label">
+                        <span>{{ stats.style_map.get(d.final_result, d.final_result) }}</span>
+                        <span>{{ d.cnt }} ({{ (d.cnt * 100 / total) | round(0) | int }}%)</span>
+                    </div>
+                    <div class="bar-track">
+                        <div class="bar-fill bar-fill-{{ d.final_result | lower }}" style="width: {{ (d.cnt * 100 / total) | round(1) }}%"></div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="section">
+            <h3>Разбивка по возрастным группам</h3>
+            {% if stats.by_age %}
+            <table class="data-table">
+                <thead><tr><th>Возраст</th><th>Стиль</th><th>Количество</th></tr></thead>
+                <tbody id="age-tbody">
+                    {% for row in stats.by_age %}
+                    <tr>
+                        <td>{{ row.age_group or '—' }}</td>
+                        <td>{{ stats.style_map.get(row.final_result, row.final_result) }}</td>
+                        <td>{{ row.cnt }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p style="color:#52525b;font-size:14px">Пока нет данных</p>
+            {% endif %}
+        </div>
+
+        <div class="section">
+            <h3>Разбивка по сессиям</h3>
+            {% if stats.by_session %}
+            <table class="data-table">
+                <thead><tr><th>Сессия</th><th>Описание</th><th>Стиль</th><th>Количество</th></tr></thead>
+                <tbody id="session-tbody">
+                    {% for row in stats.by_session %}
+                    <tr>
+                        <td>{{ row.session_id }}</td>
+                        <td>{{ row.description or '—' }}</td>
+                        <td>{{ stats.style_map.get(row.final_result, row.final_result) }}</td>
+                        <td>{{ row.cnt }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p style="color:#52525b;font-size:14px">Пока нет данных</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <script>
+    const FILL_MAP = { 'A': 'bar-fill-a', 'B': 'bar-fill-b', 'C': 'bar-fill-c' };
+    let STYLE_MAP = {{ stats.style_map | tojson }};
+    let autoTimer = null;
+
+    async function loadStats() {
+        try {
+            const resp = await fetch('/api/global/stats');
+            const data = await resp.json();
+            if (data.style_map) STYLE_MAP = data.style_map;
+            updateUI(data);
+        } catch (e) { console.error('Failed to load stats', e); }
+    }
+
+    function updateUI(data) {
+        const total = data.total || 0;
+        document.getElementById('card-total').textContent = total;
+
+        const dist = {};
+        for (const d of data.distribution) dist[d.final_result] = d.cnt;
+        for (const letter of ['A', 'B', 'C']) {
+            const el = document.getElementById('card-' + letter);
+            if (el) el.textContent = dist[letter] || 0;
+        }
+
+        const barsContainer = document.getElementById('bars-container');
+        let barsHTML = '';
+        for (const letter of ['A', 'B', 'C']) {
+            const cnt = dist[letter] || 0;
+            const pct = total > 0 ? (cnt * 100 / total).toFixed(1) : 0;
+            barsHTML += `<div class="bar-group"><div class="bar-label"><span>${STYLE_MAP[letter] || letter}</span><span>${cnt} (${Math.round(pct)}%)</span></div><div class="bar-track"><div class="bar-fill ${FILL_MAP[letter]}" style="width: ${pct}%"></div></div></div>`;
+        }
+        barsContainer.innerHTML = barsHTML;
+
+        const ageTbody = document.getElementById('age-tbody');
+        if (ageTbody && data.by_age) {
+            let rows = '';
+            for (const row of data.by_age) rows += `<tr><td>${row.age_group || '—'}</td><td>${STYLE_MAP[row.final_result] || row.final_result}</td><td>${row.cnt}</td></tr>`;
+            ageTbody.innerHTML = rows;
+        }
+
+        const sessionTbody = document.getElementById('session-tbody');
+        if (sessionTbody && data.by_session) {
+            let rows = '';
+            for (const row of data.by_session) rows += `<tr><td>${row.session_id}</td><td>${row.description || '—'}</td><td>${STYLE_MAP[row.final_result] || row.final_result}</td><td>${row.cnt}</td></tr>`;
+            sessionTbody.innerHTML = rows;
+        }
+    }
+
+    function toggleAutoRefresh() {
+        if (document.getElementById('auto-refresh').checked) {
+            loadStats(); autoTimer = setInterval(loadStats, 10000);
+        } else { clearInterval(autoTimer); autoTimer = null; }
+    }
+    </script>
+</body>
+</html>

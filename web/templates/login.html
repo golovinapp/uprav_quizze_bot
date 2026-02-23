@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Авторизация — GenZ Quiz</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700&display=swap');
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Golos Text', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #0f1117;
+            color: #e4e4e7;
+        }
+        .card {
+            background: #1a1b23;
+            border: 1px solid #2a2b35;
+            border-radius: 16px;
+            padding: 48px 40px;
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+        .card h1 {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #f4f4f5;
+        }
+        .card p {
+            font-size: 14px;
+            color: #71717a;
+            margin-bottom: 32px;
+        }
+        .error {
+            background: #3b1219;
+            border: 1px solid #7f1d2f;
+            color: #fca5a5;
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            margin-bottom: 20px;
+        }
+        input[type="password"] {
+            width: 100%;
+            padding: 12px 16px;
+            background: #0f1117;
+            border: 1px solid #2a2b35;
+            border-radius: 10px;
+            color: #e4e4e7;
+            font-size: 15px;
+            font-family: inherit;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        input[type="password"]:focus {
+            border-color: #6366f1;
+        }
+        button {
+            width: 100%;
+            margin-top: 16px;
+            padding: 12px;
+            background: #6366f1;
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 500;
+            font-family: inherit;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        button:hover { background: #4f46e5; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>GenZ Quiz — Панель управления</h1>
+        <p>Введите секретный ключ для входа</p>
+        {% if error %}
+        <div class="error">Неверный ключ. Попробуйте ещё раз.</div>
+        {% endif %}
+        <form method="POST" action="/login">
+            <input type="password" name="secret" placeholder="Секретный ключ" autofocus required>
+            <button type="submit">Войти</button>
+        </form>
+    </div>
+</body>
+</html>
